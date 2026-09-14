@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+*.log
+
+# Env files
+.env
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Keep placeholder dirs but ignore their contents
+!media/.gitkeep
+!static/.gitkeep

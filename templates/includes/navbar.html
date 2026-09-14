@@ -1,0 +1,21 @@
+{% load static %}
+<nav class="navbar">
+    <div class="navbar-brand">
+        <a href="{% url 'core:home' %}">Trade Assistant</a>
+    </div>
+    <div class="navbar-links">
+        {% if user.is_authenticated %}
+            <a href="{% url 'core:home' %}">Home</a>
+            <a href="{% url 'journal:index' %}">Journal</a>
+            <a href="{% url 'backtesting:index' %}">Backtesting</a>
+            <span class="navbar-user">{{ user.username }}</span>
+            <form action="{% url 'accounts:logout' %}" method="post" class="navbar-logout-form">
+                {% csrf_token %}
+                <button type="submit" class="link-button">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'accounts:login' %}">Login</a>
+            <a href="{% url 'accounts:register' %}">Register</a>
+        {% endif %}
+    </div>
+</nav>

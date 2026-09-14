@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Home — Trade Assistant{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Welcome, {{ user.username }}</h1>
+    <p>This is the Trade Assistant home page. Dashboard statistics, charts,
+    and analytics will be added in later phases.</p>
+    <div class="quick-links">
+        <a href="{% url 'journal:index' %}">Journal</a>
+        <a href="{% url 'backtesting:index' %}">Backtesting</a>
+    </div>
+</div>
+{% endblock %}
