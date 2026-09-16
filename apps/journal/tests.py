@@ -53,7 +53,7 @@ class TradeModelTests(TestCase):
                 timeframe=Timeframe.H1,
                 position_size=Decimal("1.0"),
                 entry_price=Decimal("2450.5"),
-                result=Result.OPEN,
+                result=Result.WIN,
             )
 
     def test_optional_fields_can_be_blank(self):
@@ -83,11 +83,11 @@ class TradeModelTests(TestCase):
             self.assertEqual(trade.timeframe, tf)
 
     def test_result_choices(self):
-        for result in [Result.OPEN, Result.WIN, Result.LOSS, Result.BREAKEVEN]:
+        for result in [Result.WIN, Result.LOSS, Result.RISK_FREE]:
             trade = self._make_trade(result=result, asset="EURUSD")
             self.assertEqual(trade.result, result)
 
-    def test_result_defaults_to_open_when_not_specified(self):
+    def test_result_defaults_to_win_when_not_specified(self):
         trade = Trade.objects.create(
             user=self.user,
             date=date(2026, 9, 1),
@@ -98,7 +98,7 @@ class TradeModelTests(TestCase):
             position_size=Decimal("0.10"),
             entry_price=Decimal("60000.00000"),
         )
-        self.assertEqual(trade.result, Result.OPEN)
+        self.assertEqual(trade.result, Result.WIN)
 
     def test_str_representation(self):
         trade = self._make_trade()
@@ -136,7 +136,7 @@ class AddTradeViewTests(TestCase):
             "strategy": "",
             "session": "",
             "risk_amount": "",
-            "result": Result.OPEN,
+            "result": Result.WIN,
             "notes": "",
             "tags": "",
         }
@@ -238,7 +238,7 @@ class TradeDetailViewTests(TestCase):
             timeframe=Timeframe.M15,
             position_size=Decimal("0.50"),
             entry_price=Decimal("1.08453"),
-            result=Result.OPEN,
+            result=Result.WIN,
         )
 
     def test_owner_can_view_their_own_trade(self):
@@ -346,7 +346,7 @@ class JournalIndexViewTests(TestCase):
     def test_empty_state_is_displayed_when_no_trades(self):
         self.client.login(username="usera", password="SuperSecret123!")
         response = self.client.get(self.url)
-        self.assertContains(response, "No trades yet.")
+        self.assertContains(response, "No trades yet")
 
     def test_trade_link_points_to_actual_pk(self):
         trade = self._make_trade(self.user_a)

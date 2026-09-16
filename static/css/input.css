@@ -1,0 +1,282 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==================================================================
+   BASE
+   ================================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg text-text font-sans antialiased;
+  }
+
+  ::selection {
+    @apply bg-primary/30 text-text;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ==================================================================
+   COMPONENTS — reusable design-system building blocks
+   ================================================================== */
+
+@layer components {
+  /* ---- Buttons ---- */
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded font-medium text-sm
+           px-4 py-2.5 transition-all duration-150 ease-out
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+           focus-visible:ring-offset-bg disabled:opacity-50 disabled:pointer-events-none
+           select-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-white shadow-card
+           hover:bg-primary-hover hover:-translate-y-px
+           active:translate-y-0 active:bg-primary-active
+           focus-visible:ring-primary;
+  }
+
+  .btn-secondary {
+    @apply btn bg-surface-raised text-text border border-border
+           hover:border-primary/40 hover:bg-surface
+           focus-visible:ring-border;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger/10 text-danger border border-danger/30
+           hover:bg-danger/20
+           focus-visible:ring-danger;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-text-muted
+           hover:text-text hover:bg-surface-raised
+           focus-visible:ring-border;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  /* ---- Cards ---- */
+
+  .card {
+    @apply bg-surface border border-border rounded-lg p-5 sm:p-6 shadow-card;
+  }
+
+  .card-interactive {
+    @apply card transition-all duration-150 ease-out
+           hover:border-primary/30 hover:-translate-y-0.5 hover:shadow-elevated;
+  }
+
+  /* ---- Page structure ---- */
+
+  .page-header {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold tracking-tight text-text;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-text-muted mt-1;
+  }
+
+  .section-title {
+    @apply text-sm font-semibold uppercase tracking-wide text-text-muted mb-3;
+  }
+
+  /* ---- Forms ---- */
+
+  .field-group {
+    @apply mb-4;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium text-text-muted mb-1.5;
+  }
+
+  .field-input,
+  .field-select,
+  .field-textarea {
+    @apply w-full rounded-lg border border-border bg-bg text-gray-300 text-sm
+           px-3 py-2.5 placeholder:text-text-faint
+           transition-colors duration-150 ease-out
+           focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/40
+           hover:border-border-subtle;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .field-textarea {
+    @apply resize-y;
+  }
+
+  .field-select {
+    @apply appearance-none bg-no-repeat pr-9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%239aa0ab'%3E%3Cpath fill-rule='evenodd' d='M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.24 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-position: right 0.65rem center;
+    background-size: 1.1em;
+  }
+
+  .field-help {
+    @apply text-xs text-text-faint mt-1.5;
+    color: #9aa0ab !important;
+    font-size: 0.75rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .field-error-list {
+    @apply text-xs text-danger mt-1.5 space-y-0.5 list-none p-0;
+  }
+
+  .field-error {
+    @apply border-danger/60 focus:border-danger focus:ring-danger/30;
+  }
+
+  .trade-form {
+    @apply text-black;
+  }
+
+  .trade-form .field-label,
+  .trade-form .field-help,
+  .trade-form .field-group,
+  .trade-form .field-error-list,
+  .trade-form .field-input,
+  .trade-form .field-select,
+  .trade-form .field-textarea {
+    color: #111827;
+  }
+
+  .trade-form .field-input::placeholder,
+  .trade-form .field-select::placeholder,
+  .trade-form .field-textarea::placeholder {
+    color: #6b7280;
+  }
+
+  /* ---- Badges ---- */
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold
+           tracking-wide uppercase;
+  }
+
+  .badge-success {
+    @apply badge bg-success-muted text-success;
+  }
+
+  .badge-danger {
+    @apply badge bg-danger-muted text-danger;
+  }
+
+  .badge-neutral {
+    @apply badge bg-neutral-muted text-neutral;
+  }
+
+  .badge-warning {
+    @apply badge bg-warning-muted text-warning;
+  }
+
+  /* ---- Tables ---- */
+
+  .table-wrap {
+    @apply overflow-x-auto rounded-lg border border-border;
+  }
+
+  .data-table {
+    @apply w-full text-sm border-collapse;
+  }
+
+  .data-table thead th {
+    @apply text-left text-xs font-semibold uppercase tracking-wide text-text-muted
+           bg-surface-raised px-4 py-3 border-b border-border whitespace-nowrap;
+  }
+
+  .data-table tbody td {
+    @apply px-4 py-3 border-b border-border-subtle text-text whitespace-nowrap;
+  }
+
+  .data-table tbody tr {
+    @apply transition-colors duration-150 ease-out;
+  }
+
+  .data-table tbody tr:hover {
+    @apply bg-surface-raised;
+  }
+
+  .data-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  /* ---- Empty state ---- */
+
+  .empty-state {
+    @apply flex flex-col items-center justify-center text-center gap-3 py-14 px-6;
+  }
+
+  .empty-state-title {
+    @apply text-base font-semibold text-text;
+  }
+
+  .empty-state-body {
+    @apply text-sm text-text-muted max-w-sm;
+  }
+
+  /* ---- Alerts / messages (toasts) ---- */
+
+  .toast {
+    @apply flex items-start gap-3 rounded border px-4 py-3 text-sm shadow-elevated
+           bg-surface-raised animate-toast-in;
+  }
+
+  .toast-success {
+    @apply toast border-success/30 text-text;
+  }
+
+  .toast-error,
+  .toast-danger {
+    @apply toast border-danger/30 text-text;
+  }
+
+  .toast-info,
+  .toast-warning {
+    @apply toast border-border text-text;
+  }
+
+  /* ---- Sidebar navigation ---- */
+
+  .nav-link {
+    @apply flex items-center gap-3 rounded px-3 py-2.5 text-sm font-medium
+           text-text-muted transition-all duration-150 ease-out
+           hover:bg-surface-raised hover:text-text;
+  }
+
+  .nav-link-active {
+    @apply nav-link bg-primary/10 text-primary
+           border-l-2 border-primary -ml-0.5 pl-[calc(0.75rem-2px)];
+  }
+
+  /* ---- Animation utility ---- */
+
+  .animate-in {
+    @apply animate-fade-in-up;
+  }
+}

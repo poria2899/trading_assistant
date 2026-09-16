@@ -1,7 +1,21 @@
 {% if messages %}
-<ul class="messages">
+<div class="mb-6 space-y-2" aria-live="polite">
     {% for message in messages %}
-    <li class="message message-{{ message.tags }}">{{ message }}</li>
+    <div data-toast
+         class="toast toast-{{ message.tags }} transition-all duration-200"
+         role="{% if 'error' in message.tags %}alert{% else %}status{% endif %}">
+        <span class="mt-0.5 flex-shrink-0" aria-hidden="true">
+            {% if 'success' in message.tags %}&#9989;
+            {% elif 'error' in message.tags or 'danger' in message.tags %}&#9888;&#65039;
+            {% else %}&#8505;&#65039;
+            {% endif %}
+        </span>
+        <span class="flex-1">{{ message }}</span>
+        <button type="button" data-toast-dismiss aria-label="Dismiss"
+                class="flex-shrink-0 text-text-faint transition-colors hover:text-text">
+            &times;
+        </button>
+    </div>
     {% endfor %}
-</ul>
+</div>
 {% endif %}

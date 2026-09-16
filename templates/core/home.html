@@ -3,13 +3,31 @@
 {% block title %}Home — Trade Assistant{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1>Welcome, {{ user.username }}</h1>
-    <p>This is the Trade Assistant home page. Dashboard statistics, charts,
-    and analytics will be added in later phases.</p>
-    <div class="quick-links">
-        <a href="{% url 'journal:index' %}">Journal</a>
-        <a href="{% url 'backtesting:index' %}">Backtesting</a>
+<div class="mb-8">
+    <p class="page-subtitle mb-1">Welcome back, {{ user.username }}</p>
+    <h1 class="page-title text-3xl">Track. Analyze. Improve.</h1>
+</div>
+
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <a href="{% url 'journal:index' %}" class="card-interactive block">
+        <h2 class="text-base font-semibold text-text mb-1">Journal</h2>
+        <p class="text-sm text-text-muted">Record and review your trades in one place.</p>
+    </a>
+
+    <a href="{% url 'backtesting:index' %}" class="card-interactive block">
+        <div class="flex items-center justify-between mb-1">
+            <h2 class="text-base font-semibold text-text">Backtesting</h2>
+            <span class="badge-neutral">Soon</span>
+        </div>
+        <p class="text-sm text-text-muted">Test strategies against historical data.</p>
+    </a>
+
+    <div class="card opacity-70">
+        <div class="flex items-center justify-between mb-1">
+            <h2 class="text-base font-semibold text-text">Forward Testing</h2>
+            <span class="badge-neutral">Soon</span>
+        </div>
+        <p class="text-sm text-text-muted">Validate strategies in live/simulated conditions.</p>
     </div>
 </div>
 {% endblock %}

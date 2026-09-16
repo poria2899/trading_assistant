@@ -84,12 +84,16 @@ trade_assistant/
 │   └── analytics/          # Analytics (Phase 9+, reads from other apps)
 ├── templates/              # Project-level shared templates
 │   ├── base.html
-│   ├── includes/            # navbar.html, messages.html
+│   ├── includes/            # sidebar.html, topbar.html, messages.html
 │   ├── core/                # home.html
 │   ├── accounts/            # login.html, register.html
-│   ├── journal/              # index.html (placeholder)
+│   ├── journal/              # index.html, trade_form.html, trade_detail.html
 │   └── backtesting/          # index.html (placeholder)
-├── static/css/base.css     # Minimal dark stylesheet
+├── static/css/input.css    # Tailwind source (tokens + component layer)
+├── static/css/tailwind.css # Compiled, committed Tailwind output
+├── static/js/app.js        # Mobile nav + toast dismiss JS
+├── tailwind.config.js      # Tailwind design tokens
+├── package.json            # Tailwind CLI devDependency + build scripts
 ├── media/                  # User uploads (screenshots, etc. — Phase 3+)
 ├── requirements.txt
 ├── .env.example
@@ -189,3 +193,37 @@ No custom User model and no third-party auth package — the default
 
 No trading data models exist yet — that's intentional and starts in
 Phase 2.
+
+## UI / Design system (Tailwind CSS)
+
+The UI is a server-rendered, dark, red-accented design system built with
+Tailwind CSS — no frontend framework. Django templates are still the
+rendering layer; Tailwind only compiles the CSS.
+
+- Design tokens (colors, radius, shadows, animation) live in
+  `tailwind.config.js`.
+- Reusable component classes (`.btn-primary`, `.card`, `.field-input`,
+  `.badge-success`, `.data-table`, `.toast`, `.nav-link`, etc.) are
+  defined once in `static/css/input.css` under `@layer components` and
+  reused across templates instead of styling each page independently.
+- `static/css/tailwind.css` is the **compiled, committed** output that
+  templates actually `{% static %}` link to — the app does not depend on
+  a build step at runtime or on a CDN.
+- `static/js/app.js` is small, dependency-free JS for the mobile nav
+  drawer and toast auto-dismiss — everything else (hover/focus
+  transitions, smooth scroll) is plain CSS.
+
+### Build commands
+
+Requires Node.js (used only to run the Tailwind CLI at build time — it is
+not a runtime dependency of the Django app).
+
+```bash
+npm install            # installs tailwindcss (devDependency only)
+npm run build:css      # one-off compile -> static/css/tailwind.css
+npm run watch:css      # rebuilds on save while developing templates
+```
+
+Run `npm run build:css` after changing any Tailwind classes in templates
+or editing `static/css/input.css` / `tailwind.config.js`, and commit the
+regenerated `static/css/tailwind.css`.

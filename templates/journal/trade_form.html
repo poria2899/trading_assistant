@@ -3,53 +3,93 @@
 {% block title %}Add Trade — Trade Assistant{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1>Add Trade</h1>
-
-    <form method="post">
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-            <ul class="errorlist">
-                {% for error in form.non_field_errors %}
-                <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-
-        <fieldset>
-            <legend>Trade Information</legend>
-            {{ form.date.as_field_group }}
-            {{ form.time.as_field_group }}
-            {{ form.asset.as_field_group }}
-            {{ form.direction.as_field_group }}
-            {{ form.timeframe.as_field_group }}
-        </fieldset>
-
-        <fieldset>
-            <legend>Position</legend>
-            {{ form.position_size.as_field_group }}
-            {{ form.entry_price.as_field_group }}
-            {{ form.stop_loss.as_field_group }}
-            {{ form.take_profit.as_field_group }}
-            {{ form.exit_price.as_field_group }}
-        </fieldset>
-
-        <fieldset>
-            <legend>Trade Details</legend>
-            {{ form.strategy.as_field_group }}
-            {{ form.session.as_field_group }}
-            {{ form.risk_amount.as_field_group }}
-            {{ form.result.as_field_group }}
-        </fieldset>
-
-        <fieldset>
-            <legend>Notes</legend>
-            {{ form.notes.as_field_group }}
-            {{ form.tags.as_field_group }}
-        </fieldset>
-
-        <button type="submit">Save Trade</button>
-    </form>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Add Trade</h1>
+        <p class="page-subtitle">Record a new trade in your journal.</p>
+    </div>
 </div>
+
+<form method="post" novalidate class="trade-form">
+    <style>
+        .trade-form .field-label,
+        .trade-form .section-title,
+        .trade-form .page-title,
+        .trade-form .page-subtitle {
+            color: #fff !important;
+        }
+
+        .trade-form .field-input,
+        .trade-form .field-select,
+        .trade-form .field-textarea,
+        .trade-form .field-help,
+        .trade-form .field-error-list,
+        .trade-form .field-error-list li,
+        .trade-form .field-input::placeholder,
+        .trade-form .field-select::placeholder,
+        .trade-form .field-textarea::placeholder {
+            color: #9ca3af !important;
+            font-size: 0.875rem !important;
+        }
+
+        .trade-form .field-input,
+        .trade-form .field-select,
+        .trade-form .field-textarea {
+            border-radius: 8px !important;
+            padding-top: 0.45rem !important;
+            padding-bottom: 0.45rem !important;
+            min-height: 2.5rem !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+    </style>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+    <div class="card border-danger/30 mb-4">
+        <ul class="field-error-list">
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="grid gap-4 lg:grid-cols-2">
+        <div class="card">
+            <h2 class="section-title">Trade Information</h2>
+            {% include "journal/_field.html" with field=form.date %}
+            {% include "journal/_field.html" with field=form.time %}
+            {% include "journal/_field.html" with field=form.asset %}
+            {% include "journal/_field.html" with field=form.direction %}
+            {% include "journal/_field.html" with field=form.timeframe %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Position</h2>
+            {% include "journal/_field.html" with field=form.position_size %}
+            {% include "journal/_field.html" with field=form.entry_price %}
+            {% include "journal/_field.html" with field=form.stop_loss %}
+            {% include "journal/_field.html" with field=form.take_profit %}
+            {% include "journal/_field.html" with field=form.exit_price %}
+            {% include "journal/_field.html" with field=form.risk_amount %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Trade Context</h2>
+            {% include "journal/_field.html" with field=form.strategy %}
+            {% include "journal/_field.html" with field=form.session %}
+            {% include "journal/_field.html" with field=form.tags %}
+        </div>
+
+        <div class="card">
+            <h2 class="section-title">Result / Notes</h2>
+            {% include "journal/_field.html" with field=form.result %}
+            {% include "journal/_field.html" with field=form.notes %}
+        </div>
+    </div>
+
+    <div class="flex items-center gap-3 mt-6">
+        <button type="submit" class="btn-primary">Save Trade</button>
+        <a href="{% url 'journal:index' %}" class="btn-secondary">Cancel</a>
+    </div>
+</form>
 {% endblock %}

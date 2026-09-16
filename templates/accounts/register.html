@@ -3,13 +3,71 @@
 {% block title %}Register — Trade Assistant{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1>Register</h1>
-    <form method="post">
+<div class="card animate-in">
+    <div class="flex items-center gap-2 mb-6 justify-center">
+        <span class="flex h-9 w-9 items-center justify-center rounded bg-primary text-white text-sm font-bold">TA</span>
+        <span class="text-sm font-bold tracking-wide">TRADE <span class="text-primary">ASSISTANT</span></span>
+    </div>
+
+    <h1 class="page-title text-xl text-center mb-1">Create your account</h1>
+    <p class="page-subtitle text-center mb-6">Start building your trading journal.</p>
+
+    <style>
+        .auth-form {
+            width: 100% !important;
+            max-width: 36rem !important;
+        }
+
+        .auth-form .field-group,
+        .auth-form .field-group > div {
+            width: 100% !important;
+        }
+
+        .auth-form label,
+        .auth-form .field-label {
+            color: #ffffff !important;
+        }
+
+        .auth-form input,
+        .auth-form select,
+        .auth-form textarea {
+            width: 100% !important;
+            max-width: 100% !important;
+            color: #d1d5db !important;
+            border-radius: 10px !important;
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+            padding-top: 0.8rem !important;
+            padding-bottom: 0.8rem !important;
+        }
+    </style>
+
+    <form method="post" class="auth-form space-y-3 mx-auto w-full" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Create account</button>
+        {% if form.non_field_errors %}
+        <ul class="field-error-list mb-4 text-center">
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="field-group mb-4">
+            <label class="field-label block text-left mb-1.5" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="w-full">{{ field }}</div>
+            {% if field.errors %}
+            <ul class="field-error-list mt-1.5 text-left">
+                {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-primary w-full mt-2">Create account</button>
     </form>
-    <p>Already have an account? <a href="{% url 'accounts:login' %}">Login</a></p>
+
+    <p class="text-sm text-text-muted text-center mt-6">
+        Already have an account?
+        <a href="{% url 'accounts:login' %}" class="text-primary hover:text-primary-hover transition-colors">Login</a>
+    </p>
 </div>
 {% endblock %}

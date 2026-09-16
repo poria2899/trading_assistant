@@ -3,51 +3,81 @@
 {% block title %}Journal — Trade Assistant{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1>Journal</h1>
-    <div class="quick-links">
-        <a href="{% url 'journal:add_trade' %}">Add Trade</a>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Journal</h1>
+        <p class="page-subtitle">Track your trades and improve your performance.</p>
     </div>
-
-    {% if trades %}
-    <div class="table-scroll">
-        <table class="trade-table">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Asset</th>
-                    <th>Direction</th>
-                    <th>Timeframe</th>
-                    <th>Position Size</th>
-                    <th>Entry Price</th>
-                    <th>Exit Price</th>
-                    <th>Result</th>
-                    <th>Strategy</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for trade in trades %}
-                <tr>
-                    <td>{{ trade.date }}</td>
-                    <td>{{ trade.time }}</td>
-                    <td>{{ trade.asset }}</td>
-                    <td>{{ trade.get_direction_display }}</td>
-                    <td>{{ trade.get_timeframe_display }}</td>
-                    <td>{{ trade.position_size }}</td>
-                    <td>{{ trade.entry_price }}</td>
-                    <td>{{ trade.exit_price|default_if_none:"—" }}</td>
-                    <td>{{ trade.get_result_display }}</td>
-                    <td>{{ trade.strategy|default:"—" }}</td>
-                    <td><a href="{% url 'journal:trade_detail' trade.pk %}">View</a></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <p>No trades yet.</p>
-    {% endif %}
+    <a href="{% url 'journal:add_trade' %}" class="btn-primary">
+        <span aria-hidden="true">+</span> Add Trade
+    </a>
 </div>
+
+{% if trades %}
+<div class="mb-4">
+    <h2 class="section-title">Your Trades</h2>
+</div>
+
+<div class="table-wrap">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Asset</th>
+                <th>Direction</th>
+                <th>Timeframe</th>
+                <th>Position Size</th>
+                <th>Entry Price</th>
+                <th>Exit Price</th>
+                <th>Result</th>
+                <th>Strategy</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for trade in trades %}
+            <tr>
+                <td>{{ trade.date }}</td>
+                <td>{{ trade.time }}</td>
+                <td class="font-medium text-text">{{ trade.asset }}</td>
+                <td>
+                    {% if trade.direction == "BUY" %}
+                    <span class="badge-success">Buy</span>
+                    {% else %}
+                    <span class="badge-danger">Sell</span>
+                    {% endif %}
+                </td>
+                <td>{{ trade.get_timeframe_display }}</td>
+                <td>{{ trade.position_size }}</td>
+                <td>{{ trade.entry_price }}</td>
+                <td>{{ trade.exit_price|default_if_none:"—" }}</td>
+                <td>
+                    {% if trade.result == "WIN" %}
+                    <span class="badge-success">Win</span>
+                    {% elif trade.result == "LOSS" %}
+                    <span class="badge-danger">Loss</span>
+                    {% elif trade.result == "BREAKEVEN" %}
+                    <span class="badge-neutral">Breakeven</span>
+                    {% else %}
+                    <span class="badge-neutral">Open</span>
+                    {% endif %}
+                </td>
+                <td class="text-text-muted">{{ trade.strategy|default:"—" }}</td>
+                <td class="text-right">
+                    <a href="{% url 'journal:trade_detail' trade.pk %}"
+                       class="btn-ghost btn-sm">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% else %}
+<div class="card empty-state">
+    <p class="empty-state-title">No trades yet</p>
+    <p class="empty-state-body">Your trading journal is empty. Start recording your first trade to build your performance history.</p>
+</div>
+{% endif %}
 {% endblock %}

@@ -18,10 +18,9 @@ class Timeframe(models.TextChoices):
 
 
 class Result(models.TextChoices):
-    OPEN = "OPEN", "Open"
     WIN = "WIN", "Win"
     LOSS = "LOSS", "Loss"
-    BREAKEVEN = "BREAKEVEN", "Breakeven"
+    RISK_FREE = "RISK_FREE", "Risk Free"
 
 
 class Trade(models.Model):
@@ -63,7 +62,7 @@ class Trade(models.Model):
     strategy = models.CharField(max_length=100, blank=True)
     session = models.CharField(max_length=50, blank=True)
 
-    result = models.CharField(max_length=10, choices=Result.choices, default=Result.OPEN)
+    result = models.CharField(max_length=10, choices=Result.choices, default=Result.WIN)
 
     notes = models.TextField(blank=True)
     # Simple comma-separated tags for now — no dedicated tagging system.

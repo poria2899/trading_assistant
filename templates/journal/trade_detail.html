@@ -3,45 +3,82 @@
 {% block title %}Trade Detail — Trade Assistant{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h1>{{ trade.asset }} — {{ trade.get_direction_display }}</h1>
-
-    <fieldset>
-        <legend>Trade Information</legend>
-        <p><strong>Date:</strong> {{ trade.date }}</p>
-        <p><strong>Time:</strong> {{ trade.time }}</p>
-        <p><strong>Asset:</strong> {{ trade.asset }}</p>
-        <p><strong>Direction:</strong> {{ trade.get_direction_display }}</p>
-        <p><strong>Timeframe:</strong> {{ trade.get_timeframe_display }}</p>
-        <p><strong>Session:</strong> {{ trade.session|default:"—" }}</p>
-        <p><strong>Strategy:</strong> {{ trade.strategy|default:"—" }}</p>
-        <p><strong>Tags:</strong> {{ trade.tags|default:"—" }}</p>
-    </fieldset>
-
-    <fieldset>
-        <legend>Position</legend>
-        <p><strong>Position size:</strong> {{ trade.position_size }}</p>
-        <p><strong>Entry price:</strong> {{ trade.entry_price }}</p>
-        <p><strong>Stop loss:</strong> {{ trade.stop_loss|default_if_none:"—" }}</p>
-        <p><strong>Take profit:</strong> {{ trade.take_profit|default_if_none:"—" }}</p>
-        <p><strong>Exit price:</strong> {{ trade.exit_price|default_if_none:"—" }}</p>
-        <p><strong>Risk amount:</strong> {{ trade.risk_amount|default_if_none:"—" }}</p>
-    </fieldset>
-
-    <fieldset>
-        <legend>Result</legend>
-        <p><strong>Result:</strong> {{ trade.get_result_display }}</p>
-        <p><strong>Notes:</strong> {{ trade.notes|default:"—" }}</p>
-    </fieldset>
-
-    <fieldset>
-        <legend>Metadata</legend>
-        <p><strong>Created at:</strong> {{ trade.created_at }}</p>
-        <p><strong>Updated at:</strong> {{ trade.updated_at }}</p>
-    </fieldset>
-
-    <div class="quick-links">
-        <a href="{% url 'journal:index' %}">Back to Journal</a>
+<div class="page-header items-start">
+    <div>
+        <a href="{% url 'journal:index' %}"
+           class="inline-flex items-center gap-1 text-sm text-text-muted transition-colors hover:text-primary mb-3">
+            &larr; Back to Journal
+        </a>
+        <div class="flex flex-wrap items-center gap-3">
+            <h1 class="page-title">{{ trade.asset }}</h1>
+            {% if trade.direction == "BUY" %}
+            <span class="badge-success">Buy</span>
+            {% else %}
+            <span class="badge-danger">Sell</span>
+            {% endif %}
+            <span class="badge-neutral">{{ trade.get_timeframe_display }}</span>
+            {% if trade.result == "WIN" %}
+            <span class="badge-success">Win</span>
+            {% elif trade.result == "LOSS" %}
+            <span class="badge-danger">Loss</span>
+            {% elif trade.result == "BREAKEVEN" %}
+            <span class="badge-neutral">Breakeven</span>
+            {% else %}
+            <span class="badge-neutral">Open</span>
+            {% endif %}
+        </div>
+        <p class="page-subtitle">{{ trade.date }} &middot; {{ trade.time }}</p>
     </div>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-2">
+    <div class="card">
+        <h2 class="section-title">Trade Information</h2>
+        <dl class="space-y-2.5 text-sm">
+            <div class="flex justify-between"><dt class="text-text-muted">Date</dt><dd class="font-medium">{{ trade.date }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Time</dt><dd class="font-medium">{{ trade.time }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Asset</dt><dd class="font-medium">{{ trade.asset }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Direction</dt><dd class="font-medium">{{ trade.get_direction_display }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Timeframe</dt><dd class="font-medium">{{ trade.get_timeframe_display }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Session</dt><dd class="font-medium">{{ trade.session|default:"—" }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Strategy</dt><dd class="font-medium">{{ trade.strategy|default:"—" }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Tags</dt><dd class="font-medium">{{ trade.tags|default:"—" }}</dd></div>
+        </dl>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Position</h2>
+        <dl class="space-y-2.5 text-sm">
+            <div class="flex justify-between"><dt class="text-text-muted">Position size</dt><dd class="font-medium">{{ trade.position_size }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Entry price</dt><dd class="font-medium">{{ trade.entry_price }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Stop loss</dt><dd class="font-medium">{{ trade.stop_loss|default_if_none:"—" }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Take profit</dt><dd class="font-medium">{{ trade.take_profit|default_if_none:"—" }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Exit price</dt><dd class="font-medium">{{ trade.exit_price|default_if_none:"—" }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Risk amount</dt><dd class="font-medium">{{ trade.risk_amount|default_if_none:"—" }}</dd></div>
+        </dl>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Result</h2>
+        <dl class="space-y-2.5 text-sm">
+            <div class="flex justify-between"><dt class="text-text-muted">Result</dt><dd class="font-medium">{{ trade.get_result_display }}</dd></div>
+        </dl>
+        <div class="mt-3 pt-3 border-t border-border-subtle">
+            <p class="text-text-muted text-xs uppercase tracking-wide mb-1">Notes</p>
+            <p class="text-sm">{{ trade.notes|default:"—" }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 class="section-title">Metadata</h2>
+        <dl class="space-y-2.5 text-sm">
+            <div class="flex justify-between"><dt class="text-text-muted">Created at</dt><dd class="font-medium">{{ trade.created_at }}</dd></div>
+            <div class="flex justify-between"><dt class="text-text-muted">Updated at</dt><dd class="font-medium">{{ trade.updated_at }}</dd></div>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-6">
+    <a href="{% url 'journal:index' %}" class="btn-secondary">&larr; Back to Journal</a>
 </div>
 {% endblock %}
