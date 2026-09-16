@@ -416,3 +416,84 @@ None added. Still just `Django==6.1.1`.
 - No Strategy model — `strategy` stays a plain text field.
 - No changes to Journal's `index` view/template/URL — `/journal/` is
   still the Phase 1 "Coming in Phase 2" placeholder.
+
+---
+
+# Phase 2.2 additions — Add Trade form
+
+Phase 1's auth/templates/nav and Phase 2.1's `Trade` model were untouched
+except for one required change to the Journal landing page (see §27).
+
+## 26. TradeForm
+
+`journal.forms.TradeForm` is a plain `ModelForm` on `Trade`, listing
+exactly the fields the brief asked for. `user`, `created_at`, and
+`updated_at` are simply never listed in `Meta.fields` — there is no
+`exclude` list to maintain and no risk of a submitted `user` value ever
+reaching the form, because Django never builds a form field for it in the
+first place. `date`/`time` get HTML5 `<input type="date">`/`<input
+type="time">` widgets (native browser pickers, no JS); `notes` gets a
+4-row `Textarea`. No other customization — validation is entirely
+Django's default model/field validation (required vs `blank=True`,
+`DecimalField` precision, choice validation).
+
+## 27. add_trade view and ownership
+
+`journal.views.add_trade` is `@login_required`. On `POST`, it builds the
+form from `request.POST`, and if valid calls `form.save(commit=False)`,
+sets `trade.user = request.user`, then saves. Because the form has no
+`user` field, there is nothing to override — a malicious payload
+including a `user` key is simply ignored (confirmed by
+`test_submitted_user_field_is_ignored`). This is the standard Django
+pattern for "server always chooses the owner" and needed no extra
+sanitization.
+
+On success: `messages.success(request, "Trade added successfully.")`,
+then `redirect("journal:index")` — there's no Trade Detail page yet, so
+the brief specifies redirecting back to Journal.
+
+`journal.views.index` itself is unchanged in behavior, but its template
+changed (see next section), which is why one existing Phase 1 test
+needed updating — not because Phase 1 broke, but because the brief
+explicitly asked for the placeholder text to be replaced.
+
+## 27a. Journal landing page — required content change
+
+The brief explicitly requires updating the Journal page to show the "Add
+Trade" link and a message that the trade list is coming next, replacing
+the old "Coming in Phase 2" placeholder text. `templates/journal/index.html`
+was updated accordingly. This broke
+`core.tests.PlaceholderPagesTests.test_journal_placeholder`, which
+asserted the old placeholder text — that test was updated to assert on
+"Add Trade" instead, since the underlying behavior (Journal page loads,
+200 OK, login required) is unchanged and still covered; only the exact
+wording changed, on purpose, per this milestone's own instructions.
+
+## 28. Templates
+
+- `templates/journal/index.html` — now shows "The trade list is coming
+  in the next milestone." plus an "Add Trade" link, using the existing
+  `.quick-links` style from Phase 1's home page.
+- `templates/journal/trade_form.html` — new. Extends `base.html`, uses
+  `<fieldset>`/`<legend>` to group fields into the four sections the
+  brief suggested (Trade Information / Position / Trade Details / Notes),
+  and renders each field with `{{ form.field.as_field_group }}` (Django
+  6's built-in helper that renders label + widget + help text + errors
+  together) rather than `form.as_p`, so the fieldset grouping is
+  possible. A small CSS addition in `static/css/base.css` styles
+  `fieldset`/`legend` to match the existing dark theme — no new visual
+  system, just enough to make the grouping legible.
+
+## 29. Dependencies
+
+None added.
+
+## 30. What was deliberately NOT done in Phase 2.2
+
+- No Trade list, detail, edit, or delete views/templates.
+- No filters or search.
+- No P/L, R-multiple, risk/reward, or duration validation/calculation —
+  only the model's own field-level validation runs.
+- No Strategy model or validation against one — `strategy` stays free
+  text, exactly as the form's underlying field.
+- No screenshot/attachment upload.

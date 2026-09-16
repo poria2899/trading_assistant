@@ -13,7 +13,9 @@ class PlaceholderPagesTests(TestCase):
     def test_journal_placeholder(self):
         response = self.client.get(reverse("journal:index"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Coming in Phase 2")
+        # Phase 2.2 replaced the "Coming in Phase 2" placeholder text with
+        # an Add Trade link and a note that the trade list is next.
+        self.assertContains(response, "Add Trade")
 
     def test_backtesting_placeholder(self):
         response = self.client.get(reverse("backtesting:index"))

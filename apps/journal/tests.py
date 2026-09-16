@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.test import TestCase
+from django.urls import reverse
 
 from .models import Direction, Result, Timeframe, Trade
 
@@ -112,3 +113,99 @@ class TradeModelTests(TestCase):
         trades = list(Trade.objects.all())
         self.assertEqual(trades[0], newer)
         self.assertEqual(trades[1], older)
+
+
+class AddTradeViewTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="trader1", password="SuperSecret123!")
+        self.other_user = User.objects.create_user(username="trader2", password="SuperSecret123!")
+        self.url = reverse("journal:add_trade")
+
+    def _valid_payload(self, **overrides):
+        payload = {
+            "date": "2026-09-01",
+            "time": "14:30",
+            "asset": "XAUUSD",
+            "direction": Direction.BUY,
+            "timeframe": Timeframe.H1,
+            "position_size": "1.50",
+            "entry_price": "2450.50000",
+            "stop_loss": "",
+            "take_profit": "",
+            "exit_price": "",
+            "strategy": "",
+            "session": "",
+            "risk_amount": "",
+            "result": Result.OPEN,
+            "notes": "",
+            "tags": "",
+        }
+        payload.update(overrides)
+        return payload
+
+    def test_anonymous_user_cannot_access_add_trade_page(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("accounts:login"), response.url)
+
+    def test_authenticated_user_can_access_add_trade_page(self):
+        self.client.login(username="trader1", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Add Trade")
+
+    def test_valid_submission_creates_trade(self):
+        self.client.login(username="trader1", password="SuperSecret123!")
+        response = self.client.post(self.url, self._valid_payload())
+        self.assertEqual(Trade.objects.count(), 1)
+        trade = Trade.objects.get()
+        self.assertEqual(trade.asset, "XAUUSD")
+        self.assertEqual(response.status_code, 302)
+
+    def test_created_trade_belongs_to_logged_in_user(self):
+        self.client.login(username="trader1", password="SuperSecret123!")
+        self.client.post(self.url, self._valid_payload())
+        trade = Trade.objects.get()
+        self.assertEqual(trade.user, self.user)
+
+    def test_submitted_user_field_is_ignored(self):
+        # The form has no `user` field at all, so even if a malicious
+        # payload includes a `user` key, it cannot change the owner.
+        self.client.login(username="trader1", password="SuperSecret123!")
+        payload = self._valid_payload(user=self.other_user.pk)
+        self.client.post(self.url, payload)
+        trade = Trade.objects.get()
+        self.assertEqual(trade.user, self.user)
+        self.assertNotEqual(trade.user, self.other_user)
+
+    def test_invalid_submission_missing_required_field_is_rejected(self):
+        self.client.login(username="trader1", password="SuperSecret123!")
+        payload = self._valid_payload(asset="")
+        response = self.client.post(self.url, payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Trade.objects.count(), 0)
+        self.assertContains(response, "This field is required")
+
+    def test_successful_creation_redirects_to_journal_index(self):
+        self.client.login(username="trader1", password="SuperSecret123!")
+        response = self.client.post(self.url, self._valid_payload())
+        self.assertRedirects(response, reverse("journal:index"))
+
+    def test_success_message_is_displayed(self):
+        self.client.login(username="trader1", password="SuperSecret123!")
+        response = self.client.post(self.url, self._valid_payload(), follow=True)
+        messages = list(response.context["messages"])
+        self.assertTrue(any("Trade added successfully." in str(m) for m in messages))
+
+    def test_optional_fields_can_be_omitted(self):
+        self.client.login(username="trader1", password="SuperSecret123!")
+        response = self.client.post(self.url, self._valid_payload())
+        self.assertEqual(response.status_code, 302)
+        trade = Trade.objects.get()
+        self.assertIsNone(trade.stop_loss)
+        self.assertEqual(trade.strategy, "")
+
+    def test_anonymous_user_cannot_submit_trade(self):
+        response = self.client.post(self.url, self._valid_payload())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Trade.objects.count(), 0)

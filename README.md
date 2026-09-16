@@ -10,12 +10,11 @@ the reasoning behind the project structure.
 
 ## Current phase
 
-**Phase 2.1 — Journal Trade database model.**
+**Phase 2.2 — Add Trade form.**
 
-The `journal` app now has a `Trade` model (raw trade data only — no
-calculated fields, no UI beyond Django admin). Add/list/edit/delete pages
-for trades don't exist yet; `/journal/` still shows the "Coming in
-Phase 2" placeholder.
+Authenticated users can create a Journal Trade through the website at
+`/journal/trades/add/`. The Journal page links to it. There's still no
+trade list/detail/edit/delete — those are later milestones.
 
 ## Roadmap
 
@@ -23,7 +22,7 @@ Phase 2" placeholder.
 |-------|-------|
 | 0 | Architecture and project structure |
 | 1 | Django foundation |
-| 2 | Trading Journal MVP *(in progress — 2.1 done: Trade model)* |
+| 2 | Trading Journal MVP *(in progress — 2.1 Trade model, 2.2 Add Trade form done)* |
 | 2 | Trading Journal MVP |
 | 3 | Screenshots and trade documentation |
 | 4 | Dashboard and statistics |
@@ -164,7 +163,8 @@ No custom User model and no third-party auth package — the default
 /accounts/register/   registration
 /accounts/login/      login
 /accounts/logout/     logout (POST)
-/journal/             placeholder — "Coming in Phase 2" (login required)
+/journal/             journal landing page + Add Trade link (login required)
+/journal/trades/add/  Add Trade form (login required)
 /backtesting/          placeholder — "Coming in Phase 5" (login required)
 /admin/                Django admin
 ```
@@ -174,9 +174,9 @@ No custom User model and no third-party auth package — the default
 - **core** — shared/cross-cutting functionality: the authenticated home
   page and the base template/navbar/messages includes.
 - **accounts** — registration/login/logout views, forms, and templates.
-- **journal** — Trading Journal. Has a `Trade` model (Phase 2.1) storing
-  raw trade data, registered in Django admin for inspection. No trade
-  pages/forms yet — `/journal/` is still the Phase 1 placeholder.
+- **journal** — Trading Journal. Has a `Trade` model (Phase 2.1, in Django
+  admin for inspection) and an Add Trade form at `/journal/trades/add/`
+  (Phase 2.2). No trade list/detail/edit/delete yet.
 - **backtesting** — Backtests and Backtest Trades. Placeholder index page
   only; models start in Phase 5.
 - **analytics** — derives performance data from journal/backtesting/forward

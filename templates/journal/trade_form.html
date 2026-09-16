@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Add Trade — Trade Assistant{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Add Trade</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <ul class="errorlist">
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <fieldset>
+            <legend>Trade Information</legend>
+            {{ form.date.as_field_group }}
+            {{ form.time.as_field_group }}
+            {{ form.asset.as_field_group }}
+            {{ form.direction.as_field_group }}
+            {{ form.timeframe.as_field_group }}
+        </fieldset>
+
+        <fieldset>
+            <legend>Position</legend>
+            {{ form.position_size.as_field_group }}
+            {{ form.entry_price.as_field_group }}
+            {{ form.stop_loss.as_field_group }}
+            {{ form.take_profit.as_field_group }}
+            {{ form.exit_price.as_field_group }}
+        </fieldset>
+
+        <fieldset>
+            <legend>Trade Details</legend>
+            {{ form.strategy.as_field_group }}
+            {{ form.session.as_field_group }}
+            {{ form.risk_amount.as_field_group }}
+            {{ form.result.as_field_group }}
+        </fieldset>
+
+        <fieldset>
+            <legend>Notes</legend>
+            {{ form.notes.as_field_group }}
+            {{ form.tags.as_field_group }}
+        </fieldset>
+
+        <button type="submit">Save Trade</button>
+    </form>
+</div>
+{% endblock %}
