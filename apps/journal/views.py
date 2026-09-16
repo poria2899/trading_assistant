@@ -8,12 +8,14 @@ from .models import Trade
 
 @login_required
 def index(request):
-    """Journal landing page.
+    """Journal landing page: the current user's trade list.
 
-    The trade list itself is a later milestone (Phase 2.4) — for now this
-    just links to Add Trade.
+    Ownership is enforced in the query itself (filter(user=request.user))
+    so this view can never return another user's trades. Ordering relies
+    on the Trade model's default ordering (-date, -time).
     """
-    return render(request, "journal/index.html")
+    trades = Trade.objects.filter(user=request.user)
+    return render(request, "journal/index.html", {"trades": trades})
 
 
 @login_required

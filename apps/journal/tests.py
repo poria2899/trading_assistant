@@ -282,3 +282,80 @@ class TradeDetailViewTests(TestCase):
         self.client.login(username="usera", password="SuperSecret123!")
         response = self.client.get(reverse("journal:trade_detail", args=[self.trade_a.pk]))
         self.assertContains(response, reverse("journal:index"))
+
+
+class JournalIndexViewTests(TestCase):
+    def setUp(self):
+        self.user_a = User.objects.create_user(username="usera", password="SuperSecret123!")
+        self.user_b = User.objects.create_user(username="userb", password="SuperSecret123!")
+        self.url = reverse("journal:index")
+
+    def _make_trade(self, user, **overrides):
+        defaults = dict(
+            user=user,
+            date=date(2026, 9, 1),
+            time=time(14, 30),
+            asset="XAUUSD",
+            direction=Direction.BUY,
+            timeframe=Timeframe.H1,
+            position_size=Decimal("1.50"),
+            entry_price=Decimal("2450.50000"),
+            result=Result.WIN,
+            strategy="Breakout",
+        )
+        defaults.update(overrides)
+        return Trade.objects.create(**defaults)
+
+    def test_authenticated_user_can_access_journal(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("accounts:login"), response.url)
+
+    def test_user_sees_their_own_trade(self):
+        trade = self._make_trade(self.user_a)
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        self.assertContains(response, "XAUUSD")
+        self.assertContains(response, reverse("journal:trade_detail", args=[trade.pk]))
+
+    def test_user_cannot_see_another_users_trade(self):
+        self._make_trade(self.user_b, asset="EURUSD")
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        self.assertNotContains(response, "EURUSD")
+
+    def test_reverse_user_cannot_see_others_trade(self):
+        self._make_trade(self.user_a, asset="XAUUSD")
+        self.client.login(username="userb", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        self.assertNotContains(response, "XAUUSD")
+
+    def test_multiple_trades_for_current_user_are_displayed(self):
+        self._make_trade(self.user_a, asset="XAUUSD")
+        self._make_trade(self.user_a, asset="EURUSD", date=date(2026, 9, 2))
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        self.assertContains(response, "XAUUSD")
+        self.assertContains(response, "EURUSD")
+
+    def test_empty_state_is_displayed_when_no_trades(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        self.assertContains(response, "No trades yet.")
+
+    def test_trade_link_points_to_actual_pk(self):
+        trade = self._make_trade(self.user_a)
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        expected_url = reverse("journal:trade_detail", args=[trade.pk])
+        self.assertContains(response, expected_url)
+
+    def test_add_trade_link_present(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(self.url)
+        self.assertContains(response, reverse("journal:add_trade"))

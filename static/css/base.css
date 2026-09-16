@@ -160,6 +160,35 @@ button, input[type="submit"] {
     border-radius: 4px;
 }
 
+.table-scroll {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+.trade-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.trade-table th,
+.trade-table td {
+    text-align: left;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.trade-table th {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.trade-table tbody tr:hover {
+    background: var(--bg);
+}
+
 fieldset {
     border: 1px solid var(--border);
     border-radius: 6px;

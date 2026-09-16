@@ -5,9 +5,49 @@
 {% block content %}
 <div class="card">
     <h1>Journal</h1>
-    <p>The trade list is coming in the next milestone.</p>
     <div class="quick-links">
         <a href="{% url 'journal:add_trade' %}">Add Trade</a>
     </div>
+
+    {% if trades %}
+    <div class="table-scroll">
+        <table class="trade-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Asset</th>
+                    <th>Direction</th>
+                    <th>Timeframe</th>
+                    <th>Position Size</th>
+                    <th>Entry Price</th>
+                    <th>Exit Price</th>
+                    <th>Result</th>
+                    <th>Strategy</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trade in trades %}
+                <tr>
+                    <td>{{ trade.date }}</td>
+                    <td>{{ trade.time }}</td>
+                    <td>{{ trade.asset }}</td>
+                    <td>{{ trade.get_direction_display }}</td>
+                    <td>{{ trade.get_timeframe_display }}</td>
+                    <td>{{ trade.position_size }}</td>
+                    <td>{{ trade.entry_price }}</td>
+                    <td>{{ trade.exit_price|default_if_none:"—" }}</td>
+                    <td>{{ trade.get_result_display }}</td>
+                    <td>{{ trade.strategy|default:"—" }}</td>
+                    <td><a href="{% url 'journal:trade_detail' trade.pk %}">View</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No trades yet.</p>
+    {% endif %}
 </div>
 {% endblock %}
