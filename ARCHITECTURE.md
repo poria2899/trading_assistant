@@ -497,3 +497,91 @@ None added.
 - No Strategy model or validation against one — `strategy` stays free
   text, exactly as the form's underlying field.
 - No screenshot/attachment upload.
+
+---
+
+# Phase 2.3 additions — Trade Detail page
+
+Phase 1's auth/templates/nav, Phase 2.1's `Trade` model, and Phase 2.2's
+Add Trade form were all untouched. This milestone only adds a
+read-only detail view.
+
+## 31. trade_detail view and ownership enforcement
+
+`journal.views.trade_detail` is `@login_required` and retrieves the trade
+with:
+
+```python
+trade = get_object_or_404(Trade, pk=pk, user=request.user)
+```
+
+The authenticated user is part of the database query itself, not a
+check applied after fetching by `pk` alone. This means a trade belonging
+to another user and a trade that doesn't exist at all are
+indistinguishable from the outside — both 404 — so the view never leaks
+whether a given ID belongs to someone else. Confirmed by test and by a
+live run: User B requesting User A's trade ID gets exactly the same 404
+as requesting an ID that was never used.
+
+## 32. URL
+
+`journal/trades/<int:pk>/` → `journal:trade_detail`, added after
+`trades/add/` in `journal/urls.py` so the literal `add/` segment is
+matched before Django would otherwise need to attempt `<int:pk>>`
+against it (Django tries patterns in order regardless, but keeping the
+literal route first avoids any ambiguity as more `trades/...` routes are
+added later).
+
+## 33. Template
+
+`templates/journal/trade_detail.html` extends `base.html` and reuses the
+`<fieldset>`/`<legend>` grouping style introduced in Phase 2.2's Add
+Trade form (Trade Information / Position / Result / Metadata, per the
+brief), so the detail page visually matches the form page without any
+new CSS. Human-readable choice labels use `get_direction_display`,
+`get_timeframe_display`, and `get_result_display` rather than the raw
+stored values (`BUY`, `H1`, `WIN`).
+
+Optional fields use two different template filters, chosen for
+correctness rather than uniformity:
+- `default_if_none:"—"` for the nullable Decimal fields (`stop_loss`,
+  `take_profit`, `exit_price`, `risk_amount`) — this only replaces an
+  actual `None`, so a legitimately-entered `0` would still display as
+  `0`, not incorrectly hidden.
+- `default:"—"` for the optional text fields (`session`, `strategy`,
+  `tags`, `notes`), which are `blank=True` (empty string, not `None`) —
+  `default` treats an empty string as "no value" here, which is exactly
+  the model's design (see Phase 2.1's ARCHITECTURE note on `blank` vs
+  `null`).
+
+A single "Back to Journal" link is the only navigation — no Edit/Delete
+links or buttons were added, since those URLs don't exist yet and the
+brief explicitly says not to fake them.
+
+## 34. No model or migration changes
+
+The `Trade` model already had every field this page needed. No new
+migration was created — confirmed with
+`python manage.py makemigrations --check --dry-run` returning "No
+changes detected" both before and after this milestone's changes.
+
+## 35. Test discovery — unchanged from Phase 2.1's documented fix
+
+`apps/__init__.py` was NOT re-added. Tests continue to be run with
+explicit app labels: `python manage.py test core accounts journal` (see
+§23 for why bare `python manage.py test` still reports 0 tests — that
+is an unchanged, documented limitation, not a regression).
+
+## 36. Dependencies
+
+None added.
+
+## 37. What was deliberately NOT done in Phase 2.3
+
+- No Trade list — there is currently no in-app way to discover a trade's
+  ID other than the Add Trade redirect or Django admin; that's the next
+  milestone.
+- No Edit/Delete trade functionality or links.
+- No P/L, R-multiple, risk/reward, or duration display/calculation.
+- No changes to the Journal landing page beyond what Phase 2.2 already
+  did.

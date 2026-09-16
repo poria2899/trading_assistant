@@ -10,11 +10,14 @@ the reasoning behind the project structure.
 
 ## Current phase
 
-**Phase 2.2 — Add Trade form.**
+**Phase 2.3 — Trade Detail page.**
 
-Authenticated users can create a Journal Trade through the website at
-`/journal/trades/add/`. The Journal page links to it. There's still no
-trade list/detail/edit/delete — those are later milestones.
+Authenticated users can view the full detail of one of their own trades
+at `/journal/trades/<id>/`. Ownership is enforced in the query itself
+(`get_object_or_404(Trade, pk=pk, user=request.user)`), so viewing
+another user's trade or a non-existent one both return a plain 404.
+There's still no trade list — `/journal/trades/<id>/` currently has to be
+typed by hand or reached via the ID Django assigns.
 
 ## Roadmap
 
@@ -22,7 +25,7 @@ trade list/detail/edit/delete — those are later milestones.
 |-------|-------|
 | 0 | Architecture and project structure |
 | 1 | Django foundation |
-| 2 | Trading Journal MVP *(in progress — 2.1 Trade model, 2.2 Add Trade form done)* |
+| 2 | Trading Journal MVP *(in progress — 2.1 Trade model, 2.2 Add Trade form, 2.3 Trade Detail done)* |
 | 2 | Trading Journal MVP |
 | 3 | Screenshots and trade documentation |
 | 4 | Dashboard and statistics |
@@ -165,6 +168,7 @@ No custom User model and no third-party auth package — the default
 /accounts/logout/     logout (POST)
 /journal/             journal landing page + Add Trade link (login required)
 /journal/trades/add/  Add Trade form (login required)
+/journal/trades/<id>/ Trade Detail page, owner-only (login required)
 /backtesting/          placeholder — "Coming in Phase 5" (login required)
 /admin/                Django admin
 ```
@@ -175,8 +179,9 @@ No custom User model and no third-party auth package — the default
   page and the base template/navbar/messages includes.
 - **accounts** — registration/login/logout views, forms, and templates.
 - **journal** — Trading Journal. Has a `Trade` model (Phase 2.1, in Django
-  admin for inspection) and an Add Trade form at `/journal/trades/add/`
-  (Phase 2.2). No trade list/detail/edit/delete yet.
+  admin for inspection), an Add Trade form at `/journal/trades/add/`
+  (Phase 2.2), and a Trade Detail page at `/journal/trades/<id>/`
+  (Phase 2.3). No trade list/edit/delete yet.
 - **backtesting** — Backtests and Backtest Trades. Placeholder index page
   only; models start in Phase 5.
 - **analytics** — derives performance data from journal/backtesting/forward

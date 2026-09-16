@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Trade Detail — Trade Assistant{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>{{ trade.asset }} — {{ trade.get_direction_display }}</h1>
+
+    <fieldset>
+        <legend>Trade Information</legend>
+        <p><strong>Date:</strong> {{ trade.date }}</p>
+        <p><strong>Time:</strong> {{ trade.time }}</p>
+        <p><strong>Asset:</strong> {{ trade.asset }}</p>
+        <p><strong>Direction:</strong> {{ trade.get_direction_display }}</p>
+        <p><strong>Timeframe:</strong> {{ trade.get_timeframe_display }}</p>
+        <p><strong>Session:</strong> {{ trade.session|default:"—" }}</p>
+        <p><strong>Strategy:</strong> {{ trade.strategy|default:"—" }}</p>
+        <p><strong>Tags:</strong> {{ trade.tags|default:"—" }}</p>
+    </fieldset>
+
+    <fieldset>
+        <legend>Position</legend>
+        <p><strong>Position size:</strong> {{ trade.position_size }}</p>
+        <p><strong>Entry price:</strong> {{ trade.entry_price }}</p>
+        <p><strong>Stop loss:</strong> {{ trade.stop_loss|default_if_none:"—" }}</p>
+        <p><strong>Take profit:</strong> {{ trade.take_profit|default_if_none:"—" }}</p>
+        <p><strong>Exit price:</strong> {{ trade.exit_price|default_if_none:"—" }}</p>
+        <p><strong>Risk amount:</strong> {{ trade.risk_amount|default_if_none:"—" }}</p>
+    </fieldset>
+
+    <fieldset>
+        <legend>Result</legend>
+        <p><strong>Result:</strong> {{ trade.get_result_display }}</p>
+        <p><strong>Notes:</strong> {{ trade.notes|default:"—" }}</p>
+    </fieldset>
+
+    <fieldset>
+        <legend>Metadata</legend>
+        <p><strong>Created at:</strong> {{ trade.created_at }}</p>
+        <p><strong>Updated at:</strong> {{ trade.updated_at }}</p>
+    </fieldset>
+
+    <div class="quick-links">
+        <a href="{% url 'journal:index' %}">Back to Journal</a>
+    </div>
+</div>
+{% endblock %}

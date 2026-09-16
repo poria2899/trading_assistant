@@ -1,16 +1,17 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import TradeForm
+from .models import Trade
 
 
 @login_required
 def index(request):
     """Journal landing page.
 
-    The trade list itself is the next milestone (Phase 2.3) — for now
-    this just links to Add Trade.
+    The trade list itself is a later milestone (Phase 2.4) — for now this
+    just links to Add Trade.
     """
     return render(request, "journal/index.html")
 
@@ -37,3 +38,16 @@ def add_trade(request):
         form = TradeForm()
 
     return render(request, "journal/trade_form.html", {"form": form})
+
+
+@login_required
+def trade_detail(request, pk):
+    """Show one trade's full detail.
+
+    Ownership is enforced directly in the query — the authenticated user
+    is part of the lookup, not checked afterward — so a trade belonging
+    to another user 404s exactly like a non-existent trade does. This
+    deliberately doesn't reveal whether the trade exists at all.
+    """
+    trade = get_object_or_404(Trade, pk=pk, user=request.user)
+    return render(request, "journal/trade_detail.html", {"trade": trade})

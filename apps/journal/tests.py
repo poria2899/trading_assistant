@@ -209,3 +209,76 @@ class AddTradeViewTests(TestCase):
         response = self.client.post(self.url, self._valid_payload())
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Trade.objects.count(), 0)
+
+
+class TradeDetailViewTests(TestCase):
+    def setUp(self):
+        self.user_a = User.objects.create_user(username="usera", password="SuperSecret123!")
+        self.user_b = User.objects.create_user(username="userb", password="SuperSecret123!")
+
+        self.trade_a = Trade.objects.create(
+            user=self.user_a,
+            date=date(2026, 9, 1),
+            time=time(14, 30),
+            asset="XAUUSD",
+            direction=Direction.BUY,
+            timeframe=Timeframe.H1,
+            position_size=Decimal("1.50"),
+            entry_price=Decimal("2450.50000"),
+            result=Result.WIN,
+            strategy="Breakout",
+            notes="Clean setup",
+        )
+        self.trade_b = Trade.objects.create(
+            user=self.user_b,
+            date=date(2026, 9, 2),
+            time=time(9, 0),
+            asset="EURUSD",
+            direction=Direction.SELL,
+            timeframe=Timeframe.M15,
+            position_size=Decimal("0.50"),
+            entry_price=Decimal("1.08453"),
+            result=Result.OPEN,
+        )
+
+    def test_owner_can_view_their_own_trade(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(reverse("journal:trade_detail", args=[self.trade_a.pk]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "XAUUSD")
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        response = self.client.get(reverse("journal:trade_detail", args=[self.trade_a.pk]))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn(reverse("accounts:login"), response.url)
+
+    def test_user_cannot_view_another_users_trade(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(reverse("journal:trade_detail", args=[self.trade_b.pk]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_nonexistent_trade_returns_404(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(reverse("journal:trade_detail", args=[99999]))
+        self.assertEqual(response.status_code, 404)
+
+    def test_page_displays_key_trade_information(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(reverse("journal:trade_detail", args=[self.trade_a.pk]))
+        self.assertContains(response, "XAUUSD")
+        self.assertContains(response, "Buy")  # get_direction_display
+        self.assertContains(response, "H1")
+        self.assertContains(response, "Win")  # get_result_display
+        self.assertContains(response, "Breakout")
+        self.assertContains(response, "Clean setup")
+
+    def test_optional_empty_fields_show_placeholder(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(reverse("journal:trade_detail", args=[self.trade_a.pk]))
+        # trade_a has no stop_loss/take_profit/exit_price/risk_amount/session/tags
+        self.assertContains(response, "—")
+
+    def test_back_to_journal_link_present(self):
+        self.client.login(username="usera", password="SuperSecret123!")
+        response = self.client.get(reverse("journal:trade_detail", args=[self.trade_a.pk]))
+        self.assertContains(response, reverse("journal:index"))
